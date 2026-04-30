@@ -1,0 +1,106 @@
+#!/usr/bin/env bash
+
+# The systems defaults are (from /etc/paths):
+# /usr/local/bin
+# /usr/bin
+# /bin
+# /usr/sbin
+# /sbin
+
+# Sane default for the PATH
+PATH="/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin:/usr/X11/bin"
+
+# https://apple.stackexchange.com/questions/437618/why-is-homebrew-installed-in-opt-homebrew-on-apple-silicon-macs
+# Pre Silicon
+HOMEBREW_PREFIX_INTEL=/usr/local
+# Silicon
+HOMEBREW_PREFIX_SILICON=/opt/homebrew
+HOMEBREW_PREFIX=""
+CPU_ARCH="$(uname -m)"
+
+if [[ "${CPU_ARCH}" == 'x86_64' ]]; then
+  HOMEBREW_PREFIX="${HOMEBREW_PREFIX_INTEL}"
+elif [[ "${CPU_ARCH}" == 'arm64' ]]; then
+  HOMEBREW_PREFIX="${HOMEBREW_PREFIX_SILICON}"
+else
+    echo "WARNING: Unsupported CPU architecture ${CPU_ARCH}!"
+fi
+
+export HOMEBREW_PREFIX
+
+# Homebrew
+if [ -d "${HOMEBREW_PREFIX}" ] ; then
+    PATH="${HOMEBREW_PREFIX}/bin:${HOMEBREW_PREFIX}/sbin:${PATH}"
+fi
+
+# set PATH so it includes user's private bin if it exists
+if [ -d "${HOME}/bin" ] ; then
+  PATH="${HOME}/bin:${PATH}"
+fi
+
+if [ -d "${HOME}/.rvm/bin" ] ; then
+    PATH="${HOME}/.rvm/bin:${PATH}" # Add RVM to PATH for scripting
+fi
+
+if [[ "$(command -v go)" ]]; then
+    export GOPATH="${HOME}/.go"
+    export PATH="${PATH}:${GOROOT}/bin:${GOPATH}/bin"
+fi
+
+export PATH
+
+# enable 256 colors in terminal (useful for vim colorschemes)
+if [ -e /usr/share/terminfo/x/xterm-256color ] ; then
+    export TERM='xterm-256color'
+else
+    export TERM='xterm-color'
+fi
+
+# Make nano the default editor
+export EDITOR="nano"
+
+# Don’t clear the screen after quitting a manual page
+export MANPAGER="less -X"
+
+# Highlight section titles in manual pages
+# https://unix.stackexchange.com/questions/87261/getting-unexpected-colorized-output-on-several-commands
+export LESS_TERMCAP_md="$ORANGE"
+
+# make less more friendly for non-text input files, see lesspipe(1)
+if [[ -x "${HOMEBREW_PREFIX}/bin/lesspipe.sh" ]]; then
+    export LESSOPEN="|${HOMEBREW_PREFIX}/bin/lesspipe.sh %s"
+    export LESS_ADVANCED_PREPROCESSOR=1
+fi
+export LESS="-iFRsX"
+
+# Make less the pager
+export PAGER=less
+
+# Larger bash history (allow 32^2 entries; default is 500)
+export HISTSIZE=32768
+export HISTFILESIZE=$HISTSIZE
+# don't put duplicate lines in the history. See bash(1) for more options
+# ... or force ignoredups and ignorespace
+export HISTCONTROL=ignoredups:ignorespace
+# Make some commands not show up in history
+export HISTIGNORE="cd:cd -:pwd;exit:date:* --help"
+
+# http://www.gnu.org/software/gettext/manual/html_node/The-LANGUAGE-variable.html#The-LANGUAGE-variable
+export LANGUAGE=en_US.UTF-8
+# Set to UTF-8 and english locale
+# http://www.gnu.org/software/gettext/manual/html_node/Locale-Environment-Variables.html
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+
+export CLICOLOR=1
+
+if [ "linux-gnu" = "${OSTYPE}" ]; then
+    # Export some debian stuff
+    DEBEMAIL="${DEBEMAIL_local:-}"
+    DEBFULLNAME="${DEBFULLNAME_local:-}"
+    export DEBEMAIL DEBFULLNAME
+fi
+
+if [ -f "${HOME}/.local_exports" ] ; then
+    source "${HOME}/.local_exports"
+fi

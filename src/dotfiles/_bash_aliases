@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+# enable color support of ls and also add handy aliases
+if [ -x /usr/bin/dircolors ] ; then
+    if [ -r ~/.dircolors ] ; then
+        eval "$(dircolors -b ~/.dircolors)"
+    else
+        eval "$(dircolors -b)"
+    fi
+
+    alias ls='ls --color=auto'
+    alias vdir='vdir --color=auto'
+
+    alias grep='grep --color=auto'
+    alias fgrep='fgrep --color=auto'
+    alias egrep='egrep --color=auto'
+fi
+
+# some more ls aliases
+alias l='ls $LS_OPTIONS -lAhF'
+alias ll='ls $LS_OPTIONS -lhF'
+alias ls='ls $LS_OPTIONS -hF'
+
+alias du='du -h'
+alias df='df -h'
+alias ..='cd ..'
+
+# Pretty print the path
+alias path='echo $PATH | tr -s ":" "\n"'
+
+if [ -f "${HOME}/.local_aliases" ] ; then
+    # shellcheck disable=SC1090
+    source "${HOME}/.local_aliases"
+fi

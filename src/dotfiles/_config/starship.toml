@@ -1,0 +1,16 @@
+# https://starship.rs/config/
+
+command_timeout = 1000
+
+[character]
+success_symbol = "[»](bold green)"
+error_symbol= "[»](bold red)"
+
+[directory]
+truncate_to_repo = false
+
+[aws]
+disabled = true
+
+[gcloud]
+disabled = true

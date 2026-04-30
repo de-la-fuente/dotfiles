@@ -1,0 +1,166 @@
+#!/usr/bin/env bash
+
+#
+# ~/.bashrc: executed by bash(1) for non-login shells.
+#
+# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
+# for examples.
+#
+
+#
+# Debug slow startup time
+#
+# https://mdjnewman.me/2017/10/debugging-slow-bash-startup-files/
+#
+# `ts` is in `brew install moreutils`
+#
+# open file descriptor 5 such that anything written to /dev/fd/5
+# is piped through ts and then to /tmp/timestamps
+# BASH_TRACING_LOG="${HOME}/tmp/bash_tracing.log"
+# exec 5> >(ts -i "%.s" >> "${BASH_TRACING_LOG}")
+# https://www.gnu.org/software/bash/manual/html_node/Bash-Variables.html
+# export BASH_XTRACEFD="5"
+# Enable tracing
+# set -x
+
+current_time() {
+    date +"%T"
+}
+
+DEBUG_ON=""
+
+debug() {
+    if [ -z "${DEBUG_ON}" ]; then
+        return
+    fi
+
+    local t
+    t=$(current_time)
+    echo "${t} ${1}"
+}
+
+# If not running interactively, don't do anything.
+[ -z "${PS1}" ] && return
+
+echo "Loading .bashrc ..."
+
+if [ -f "${HOME}/.bash_functions" ]; then
+    # shellcheck disable=SC1091
+    source "${HOME}/.bash_functions"
+fi
+
+# Don't nerv me!
+set bell-style none
+
+# Append to the history file, don't overwrite it.
+shopt -s histappend
+# After each command, save and reload history
+if [ -n "${PROMPT_COMMAND}" ]; then
+    export PROMPT_COMMAND="history -a; history -c; history -r; ${PROMPT_COMMAND}"
+else
+    export PROMPT_COMMAND="history -a; history -c; history -r"
+fi
+
+# Check the window size after each command and, if necessary,
+# update the values of LINES and COLUMNS.
+shopt -s checkwinsize
+
+# http://www.softec.lu/site/DevelopersCorner/MasteringThePathHelper`
+# shellcheck disable=SC1090
+[[ -s "/usr/libexec/path_helper" ]] && eval "$(/usr/libexec/path_helper -s)"
+
+if [ -f "${HOME}/.bash_exports" ] ; then
+    # shellcheck disable=SC1091
+    source "${HOME}/.bash_exports"
+fi
+
+if [ -f "$HOME/.config/perl" ] ; then
+    # shellcheck disable=SC1091
+    source "$HOME/.config/perl"
+fi
+
+if [ -f "${HOME}/.bash_aliases" ] ; then
+    # shellcheck disable=SC1091
+    source "${HOME}/.bash_aliases"
+fi
+
+if [ -f "${HOME}/.ssh_aliases" ] ; then
+    # shellcheck disable=SC1091
+    source "${HOME}/.ssh_aliases"
+fi
+
+# Source additional information, which applies to the current host only.
+if [ -f "${HOME}/.bash_local" ]; then
+    # shellcheck disable=SC1091
+    source "${HOME}/.bash_local"
+fi
+
+debug ">> Local sourcing done."
+
+# Enable programmable completion features (you don't need to enable
+# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
+# sources /etc/bash.bashrc).
+if [ -f "/etc/bash_completion" ] && ! shopt -oq posix ; then
+    # shellcheck disable=SC1091
+    source "/etc/bash_completion"
+fi
+
+if [ -f "/usr/local/etc/profile.d/bash_completion.sh" ]; then
+    # shellcheck disable=SC1091
+    source "/usr/local/etc/profile.d/bash_completion.sh"
+fi
+
+# https://docs.brew.sh/Shell-Completion
+if type brew &>/dev/null; then
+    if [[ -r "${HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh" ]]; then
+        source "${HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh"
+    else
+        for COMPLETION in "${HOMEBREW_PREFIX}/etc/bash_completion.d/"*; do
+            # shellcheck disable=SC1090
+            [[ -r "${COMPLETION}" ]] && source "${COMPLETION}"
+        done
+    fi
+fi
+
+debug ">> Bash completion done."
+
+[[ "$(command -v direnv)" ]] && eval "$(direnv hook bash)"
+
+debug ">> Direnv done."
+
+# https://stackoverflow.com/questions/39381360/how-do-i-install-ruby-gems-on-mac/43293653#43293653
+[[ "$(command -v rbenv)" ]] && eval "$(rbenv init -)"
+
+debug ">> Rbenv done."
+
+# shellcheck disable=SC1091
+[[ -f "${HOME}/.fzf.bash" ]] && source "${HOME}/.fzf.bash"
+# https://salsa.debian.org/debian/fzf/blob/master/debian/README.Debian
+[[ -f /usr/share/doc/fzf/examples/key-bindings.bash ]] && source /usr/share/doc/fzf/examples/key-bindings.bash
+[[ -f /usr/share/doc/fzf/examples/completion.bash ]] && source /usr/share/doc/fzf/examples/completion.bash
+
+debug ">> FZF done."
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "${HOMEBREW_PREFIX}/opt/nvm/nvm.sh" ] && source "${HOMEBREW_PREFIX}/opt/nvm/nvm.sh"
+[ -s "${HOMEBREW_PREFIX}/opt/nvm/etc/bash_completion.d/nvm" ] && source "${HOMEBREW_PREFIX}/opt/nvm/etc/bash_completion.d/nvm"
+debug ">> Nvm done."
+
+# https://starship.rs/
+[[ "$(command -v starship)" ]] && eval "$(starship init bash)"
+debug ">> Starship done."
+
+if [[ "$(command -v pyenv)" ]]; then
+    export PYENV_ROOT="$HOME/.pyenv"
+    export PATH="$PYENV_ROOT/bin:$PATH"
+    eval "$(pyenv init -)"
+fi
+
+if [[ -s "${HOMEBREW_PREFIX}/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/completion.bash.inc" ]] ; then
+    # shellcheck disable=SC1091
+    source "${HOMEBREW_PREFIX}/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/completion.bash.inc"
+    debug ">> Google cloud SDK done."
+fi
+
+echo ".bashrc loaded :-)"
+echo

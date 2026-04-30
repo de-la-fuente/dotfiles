@@ -1,0 +1,111 @@
+[user]
+  name = ClaudIA de la Fuente
+  email = claudia@weltraumschaf.de
+
+[core]
+  editor   = nano
+  autocrlf = input
+  excludesfile = ~/.gitignore_global
+  packedGitWindowSize = 16m
+  packedGitLimit = 64m
+  commentchar = %
+  quotepath = false
+  fileMode = true
+
+[init]
+  defaultBranch = main
+
+[branch]
+  autosetuprebase = always
+
+[diff]
+  noprefix = true
+
+[push]
+  default = matching
+
+[pull]
+  rebase = true
+
+[rebase]
+  autoStash = true
+
+[merge]
+  tool = opendiff
+
+# Apply it globally in ~/.config/git/attributes:
+# ```
+# * merge=mergiraf
+# ```
+# The wildcard (*) tells Git to run every file through mergiraf. This might sound aggressive,
+# but it’s fine. If mergiraf doesn’t recognize the file type, it steps aside and Git handles it normally.
+# https://haacked.com/archive/2026/03/25/resolve-merge-conflicts/
+[merge "mergiraf"]
+  name = mergiraf
+  driver = mergiraf merge --git %O %A %B -s %S -x %X -y %Y -p %P -l %L
+
+[color]
+  diff   = auto
+  status = auto
+  branch = auto
+  ui     = true
+
+[color "diff"]
+  whitespace = red reverse
+
+[credential]
+  helper = cache --timeout=3600
+
+[pack]
+  windowMemory = 256m
+  packSizeLimit = 512m
+  threads = 2
+  deltaCacheSize = 100m
+
+[rerere]
+  enabled = true
+
+[alias]
+  # SVN like shortcuts.
+  ci = commit -s
+  st = status
+  co = checkout
+
+  # Shows the email address used for commits.
+  iam = !git config --get user.email
+
+  # Show all commits with the giben ticket id.
+  # Example (single ticket id):
+  # $> git ticket 1678
+  # Example (multiple ticket id):
+  # $> git ticket "38750\|39829\|41521"
+  ticket = ! sh -c 'git log \
+    --date=local \
+    --reverse --pretty=format:\"%H%x09%ad%x09%cn%x09%s\" \
+    --regexp-ignore-case \
+    --grep=\"${1}\"' -
+
+  # Similar to `git ticket` but shows all affected files instead of the commit list.
+  ticket-files = ! sh -c 'git log --pretty=format:\"\" \
+    --regexp-ignore-case \
+    --grep=\"${1}\" --name-only | sort | uniq' -
+
+  # Grep grouped by files with lines.
+  # http://travisjeffery.com/b/2012/02/search-a-git-repo-like-a-ninja/
+  # https://git-scm.com/docs/git-grep
+  g = grep --break --heading --line-number --ignore-case -I
+
+  # https://thoughtbot.com/blog/dumpster-diving-through-dotfiles-better-git-logging
+  sl = log --oneline --decorate
+  sla = log --oneline --decorate --graph --all
+
+  # https://thoughtbot.com/blog/dumpster-diving-through-dotfiles-git-branches
+  branches = for-each-ref --sort=-committerdate \
+    --format=\"%(color:blue)%(authordate:relative)\t%(color:red)%(authorname)\t%(color:white)%(color:bold)%(refname:short)\" \
+    refs/remotes
+
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true

@@ -1,0 +1,180 @@
+# Logs and databases #
+######################
+*.log
+*.log.[0-9]
+*.log.*.[0-9]
+*.sqlite
+
+# OS generated files #
+######################
+.DS_Store*
+ehthumbs.db
+Icon?
+Thumbs.db
+*~
+._*
+
+# Files that might appear on external disk
+.Spotlight-V100
+.Trashes
+
+# Mac bundles
+*.dmg
+*.app
+
+# IDE stuff #
+#############
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# Netbeans
+nbproject/
+nb-configuration.xml
+
+# IDEA
+.idea
+*.ipr
+*.iml
+*.iws
+
+# VS Code
+.vscode/
+.factorypath
+
+# Visual Studio
+.vs/
+
+# Programming languages #
+#########################
+
+# Node.js
+node_modules/
+
+# Maven
+dependency-reduced-pom.xml
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+release.properties
+target/
+
+# Gradle
+.gradle/
+build/
+
+# .Net Core
+[Oo]bj/
+#[Bb]in/
+packages/
+TestResults/
+# resharper
+*_Resharper.*
+*.Resharper
+# dotCover
+*.dotCover
+
+# Make
+Makefile.in
+config.make
+config.status
+aclocal.m4
+autom4te.cache/
+
+# Vagrant
+.vagrant
+
+# Python #
+##########
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+venv/
+*.egg-info/
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+# Flask stuff:
+instance/
+.webassets-cache
+# PyBuilder
+.pybuilder/
+target/
+# Jupyter Notebook
+.ipynb_checkpoints
+# IPython
+profile_default/
+ipython_config.py
+
+# Compiled source #
+###################
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+*.a
+_obj
+obj/
+_test
+*.jar
+
+# Archives #
+############
+*.tar.gz
+*.tar.bz2
+*.tar
+*.zip
+*.xz
+*.7z
+
+# Other #
+#########
+
+# LaTeX
+.texpadtmp/
+*.aux
+*.out
+*.synctex.gz
+*.toc
+*.lof
+
+# globs
+*.sln.cache
+*.suo
+*.cache
+*.pidb
+*.userprefs
+*.usertasks
+*.user
+
+# Vim
+*.swp
+*.swo
+
+# patch
+*.orig
+*.rej
+
+# Local environment
+.env
+
+# Ignore stash folders
+stash/
+
+# Draw.io
+.$*.bkp
+.$*.dtmp
+
+# https://taskfile.dev/
+.task/
